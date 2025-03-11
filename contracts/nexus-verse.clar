@@ -232,3 +232,46 @@
     )
   )
 )
+
+;; Experience System
+(define-read-only (get-next-level-requirement
+    (avatar-id uint)
+  )
+  (match (get-avatar-details avatar-id)
+    metadata (ok (calculate-level-up-experience (get level metadata)))
+    ERR-INVALID-AVATAR
+  )
+)
+
+(define-read-only (can-receive-experience
+    (avatar-id uint)
+    (experience-amount uint)
+  )
+  (match (get-avatar-details avatar-id)
+    metadata (ok (and
+      (< (get level metadata) MAX-LEVEL)
+      (validate-experience-gain 
+        (get experience metadata)
+        experience-amount
+        (get level metadata)
+      )))
+    ERR-INVALID-AVATAR
+  )
+)
+
+;; Protocol Management
+(define-public (initialize-protocol 
+  (entry-fee uint) 
+  (max-entries uint)
+)
+  (begin
+	(asserts! (is-protocol-admin tx-sender) ERR-NOT-AUTHORIZED)
+	(asserts! (and (>= entry-fee u1) (<= entry-fee u1000)) ERR-INVALID-FEE)
+	(asserts! (and (>= max-entries u1) (<= max-entries u500)) ERR-INVALID-ENTRIES)
+	
+	(var-set protocol-fee entry-fee)
+	(var-set max-leaderboard-entries max-entries)
+	
+	(ok true)
+  )
+)
