@@ -69,3 +69,46 @@
 (define-constant ERR-MAX-LEVEL-REACHED (err u22))
 (define-constant ERR-MAX-EXPERIENCE-REACHED (err u23))
 (define-constant ERR-INVALID-LEVEL-UP (err u24))
+
+;; Game Mechanics Constants
+(define-constant MAX-LEVEL u100)
+(define-constant MAX-EXPERIENCE-PER-LEVEL u1000)
+(define-constant BASE-EXPERIENCE-REQUIRED u100)
+
+;; Protocol Configuration
+(define-data-var protocol-fee uint u10)
+(define-data-var max-leaderboard-entries uint u50)
+(define-data-var total-prize-pool uint u0)
+(define-data-var total-assets uint u0)
+(define-data-var total-avatars uint u0)
+(define-data-var total-worlds uint u0)
+
+;; Access Control
+(define-map protocol-admin-whitelist principal bool)
+
+;; Validation Functions
+(define-private (is-valid-name (name (string-ascii 50)))
+  (and 
+    (>= (len name) u1)
+    (<= (len name) u50)
+    (not (is-eq name ""))
+  )
+)
+
+(define-private (is-valid-description (description (string-ascii 200)))
+  (and 
+    (>= (len description) u1)
+    (<= (len description) u200)
+    (not (is-eq description ""))
+  )
+)
+
+(define-private (is-valid-rarity (rarity (string-ascii 20)))
+  (or 
+    (is-eq rarity "common")
+    (is-eq rarity "uncommon")
+    (is-eq rarity "rare")
+    (is-eq rarity "epic")
+    (is-eq rarity "legendary")
+  )
+)
